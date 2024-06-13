@@ -1,0 +1,11 @@
+.error{
+  font-size: 30px;
+  text-align: center;
+  font-weight: bold;
+}
+.mapboxgl-ctrl-attrib{
+  display: none;
+}
+div[mapboxgl-children] {
+  display: block;
+}
