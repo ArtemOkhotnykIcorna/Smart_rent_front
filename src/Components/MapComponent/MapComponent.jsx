@@ -81,11 +81,16 @@ const MapComponent = () => {
     }, []);
 
     useEffect(() => {
-        console.log(userSity)
-       if (userSity)
-           getSitiesByName(userSity,limit,offset)
-               .then(r => setHouses(r))
+        console.log(userSity);
+
+        if (userSity) {
+            getSitiesByName(userSity, limit, offset)
+                .then(r => {
+                    setHouses(prevHouses => [...prevHouses, ...r]);
+                });
+        }
     }, [userSity]);
+
 
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
@@ -95,16 +100,17 @@ const MapComponent = () => {
                         <Map
                             mapboxAccessToken={MAPBOX_TOKEN}
                             initialViewState={initialViewState}
-                            mapStyle={"mapbox://styles/mapbox/satellite-streets-v11"}
-                            onTouchStart={isTouchDevice ? onResizeMap : undefined}
-                            onMouseDown={!isTouchDevice ? onResizeMap : undefined}
+                            // mapStyle={"mapbox://styles/mapbox/satellite-streets-v11"}
+                            mapStyle={"mapbox://styles/mapbox/dark-v9"}
+                            onTouchStart={onResizeMap}
+                            onMouseDown={ onResizeMap}
                             {...settings}
                         >
                             {houses.map(house => (
                                 <Marker
                                     key={house._id}
-                                    longitude={house.longitude}
-                                    latitude={house.latitude}
+                                    longitude={house.latitude}
+                                    latitude={house.longitude}
                                 />
                             ))}
                             <ScaleControl />
