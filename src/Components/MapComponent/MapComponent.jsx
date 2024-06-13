@@ -10,6 +10,8 @@ const MapComponent = () => {
     const [error,setError] = useState(false)
     const [userSity,setUserSity] = useState('')
     const [houses,setHouses] = useState([])
+    const [limit,setLimit] = useState(200)
+    const [offset,setOffset] = useState(0)
 
     const initialViewState = {
         longitude: longitude,
@@ -81,10 +83,11 @@ const MapComponent = () => {
     useEffect(() => {
         console.log(userSity)
        if (userSity)
-           getSitiesByName(userSity).then(r => setHouses(r))
+           getSitiesByName(userSity,limit,offset)
+               .then(r => setHouses(r))
     }, [userSity]);
 
-
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     return (
                 <>
@@ -93,7 +96,8 @@ const MapComponent = () => {
                             mapboxAccessToken={MAPBOX_TOKEN}
                             initialViewState={initialViewState}
                             mapStyle={"mapbox://styles/mapbox/satellite-streets-v11"}
-                            onTouchStart={onResizeMap}
+                            onTouchStart={isTouchDevice ? onResizeMap : undefined}
+                            onMouseDown={!isTouchDevice ? onResizeMap : undefined}
                             {...settings}
                         >
                             {houses.map(house => (

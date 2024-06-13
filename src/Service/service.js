@@ -31,7 +31,7 @@ export const getAllSities = async () => {
 };
 export const getSitiesByName = async (sityName,limit,offset) => {
     try {
-        const response = await axios.get(`https://smartrent-b950f278fa06.herokuapp.com/api/rent/house/city/${sityName}?limit=200&offset=0`);
+        const response = await axios.get(`https://smartrent-b950f278fa06.herokuapp.com/api/rent/house/city/${sityName}?limit=${limit}&offset=${offset}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching data', error);
