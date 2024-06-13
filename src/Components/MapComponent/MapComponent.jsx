@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from 'react';
-
-import Map,{Marker} from 'react-map-gl';
-import Pin from '../Pin/Pin'
+import React, {useCallback, useEffect, useState} from 'react';
+import Map, {Marker, ScaleControl} from 'react-map-gl';
 import './mapcomponent.scss'
+import {getSitiesByName, getSityByCoordination} from "../../Service/service";
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiYXJ0ZW1va2hvdG55ayIsImEiOiJjbHhhbmJ0bjAzNXpvMmtxc21lc3ZrcDl1In0.wVDbNf3FcPy754j0z9wixQ'
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
 const MapComponent = () => {
     const [latitude,setLatitude] = useState('')
     const [longitude,setLongitude] = useState('')
-    const [theme,setTheme] = useState(true)
     const [error,setError] = useState(false)
-
+    const [userSity,setUserSity] = useState('')
+    const [houses,setHouses] = useState([])
 
     const initialViewState = {
         longitude: longitude,
@@ -27,8 +26,8 @@ const MapComponent = () => {
         dragPan: true,
         keyboard: true,
         doubleClickZoom: true,
-        touchZoomRotate: true,
-        touchPitch: true,
+        touchZoomRotate: false,
+        touchPitch: false,
         minZoom: 0,
         maxZoom: 20,
         minPitch: 0,
@@ -37,7 +36,6 @@ const MapComponent = () => {
         height: '100%'
     });
 
-
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -45,6 +43,9 @@ const MapComponent = () => {
                     setLatitude(position.coords.latitude);
                     setLongitude(position.coords.longitude);
                     setError(false);
+
+                    getSityByCoordination(position.coords.latitude, position.coords.longitude)
+                        .then(r => setUserSity(r.address.city || r.address.town || r.address.village || r.address.hamlet))
                 },
                 function(error) {
                     setError(true);
@@ -67,33 +68,42 @@ const MapComponent = () => {
         } else {
             console.log("Geolocation is not supported by this browser.");
         }
-
-        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-        const handleThemeChange = (event) => {
-            setTheme(event.matches);
-        };
-
-        darkModeMediaQuery.addEventListener('change', handleThemeChange);
-
-
-        setTheme(darkModeMediaQuery.matches);
-
-        return () => {
-            darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-        };
     }, []);
+
+
+
+    const onResizeMap = useCallback((e) => {
+         console.log(e)
+        getSityByCoordination(e.lngLat.lat, e.lngLat.lng)
+            .then(r => setUserSity(r.address.city || r.address.town || r.address.village || r.address.hamlet))
+    }, []);
+
+    useEffect(() => {
+        console.log(userSity)
+       if (userSity)
+           getSitiesByName(userSity).then(r => setHouses(r))
+    }, [userSity]);
+
 
 
     return (
                 <>
-                    {latitude && longitude && !error  ? <Map
+                    {latitude && longitude && !error  ?
+                        <Map
                             mapboxAccessToken={MAPBOX_TOKEN}
                             initialViewState={initialViewState}
                             mapStyle={"mapbox://styles/mapbox/satellite-streets-v11"}
+                            onTouchStart={onResizeMap}
                             {...settings}
                         >
-                            <Marker longitude={longitude} latitude={latitude}/>
+                            {houses.map(house => (
+                                <Marker
+                                    key={house._id}
+                                    longitude={house.longitude}
+                                    latitude={house.latitude}
+                                />
+                            ))}
+                            <ScaleControl />
                         </Map> :
                         <h1 className='error'>allow see your location or turn of vpn</h1>}
                 </>

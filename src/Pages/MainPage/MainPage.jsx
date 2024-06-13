@@ -1,6 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import './mainpage.scss'
-import Map from 'react-map-gl';
 import MapComponent from "../../Components/MapComponent/MapComponent";
 
 
