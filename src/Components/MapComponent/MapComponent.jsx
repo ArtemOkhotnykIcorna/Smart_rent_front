@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import Map, {Marker, ScaleControl} from 'react-map-gl';
+import Map, {GeolocateControl, Marker, ScaleControl} from 'react-map-gl';
 import './mapcomponent.scss'
 import {getSitiesByName, getSityByCoordination} from "../../Service/service";
 
@@ -16,7 +16,7 @@ const MapComponent = () => {
     const initialViewState = {
         longitude: longitude,
         latitude: latitude,
-        zoom: 15,
+        zoom: 12,
         bearing: 0,
         pitch: 50
     };
@@ -75,24 +75,30 @@ const MapComponent = () => {
 
 
     const onResizeMap = useCallback((e) => {
-         console.log(e)
+          // console.log(e)
         getSityByCoordination(e.lngLat.lat, e.lngLat.lng)
             .then(r => setUserSity(r.address.city || r.address.town || r.address.village || r.address.hamlet))
     }, []);
+    
+    // const HOOOK = useCallback((e) => {
+    //       console.log(e)
+    // }, []);
+
 
     useEffect(() => {
-        console.log(userSity);
+        // console.log(userSity);
 
         if (userSity) {
             getSitiesByName(userSity, limit, offset)
                 .then(r => {
-                    setHouses(prevHouses => [...prevHouses, ...r]);
+                    console.log(r)
+                     setHouses(prevHouses => [...prevHouses, ...r.houses]);
                 });
         }
     }, [userSity]);
 
 
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    // const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     return (
                 <>
@@ -104,6 +110,7 @@ const MapComponent = () => {
                             mapStyle={"mapbox://styles/mapbox/dark-v9"}
                             onTouchStart={onResizeMap}
                             onMouseDown={ onResizeMap}
+                            // onDrag={HOOOK}
                             {...settings}
                         >
                             {houses.map(house => (
