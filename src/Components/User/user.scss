@@ -1,0 +1,17 @@
+.user{
+  svg{
+    cursor: pointer;
+    position: absolute;
+    z-index: 1000;
+    right: 0;
+  }
+  &_modal{
+    max-width: 450px;
+    min-width: 200px;
+    height: 50%;
+    z-index: 100;
+    position: absolute;
+    right: 0;
+    background: white;
+  }
+}

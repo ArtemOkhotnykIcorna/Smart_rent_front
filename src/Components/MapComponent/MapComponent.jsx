@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Map, {GeolocateControl, Marker, ScaleControl} from 'react-map-gl';
 import './mapcomponent.scss'
-import {getSitiesByName, getSityByCoordination} from "../../Service/service";
+import {getDataAboutUser, getSitiesByName, getSitiesByObl, getSityByCoordination} from "../../Service/service";
+import User from "../User/User";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
 const MapComponent = () => {
@@ -28,8 +29,8 @@ const MapComponent = () => {
         dragPan: true,
         keyboard: true,
         doubleClickZoom: true,
-        touchZoomRotate: false,
-        touchPitch: false,
+        touchZoomRotate: true,
+        touchPitch: true,
         minZoom: 0,
         maxZoom: 20,
         minPitch: 0,
@@ -94,6 +95,11 @@ const MapComponent = () => {
                     console.log(r)
                      setHouses(prevHouses => [...prevHouses, ...r.houses]);
                 });
+            getSitiesByObl(userSity, limit, offset)
+                .then(r => {
+                    console.log(r)
+                    setHouses(prevHouses => [...prevHouses, ...r.houses]);
+                });
         }
     }, [userSity]);
 
@@ -103,6 +109,8 @@ const MapComponent = () => {
     return (
                 <>
                     {latitude && longitude && !error  ?
+                        <>
+                        <User/>
                         <Map
                             mapboxAccessToken={MAPBOX_TOKEN}
                             initialViewState={initialViewState}
@@ -121,7 +129,9 @@ const MapComponent = () => {
                                 />
                             ))}
                             <ScaleControl />
-                        </Map> :
+                        </Map>
+                        </>
+                            :
                         <h1 className='error'>allow see your location or turn of vpn</h1>}
                 </>
     );
