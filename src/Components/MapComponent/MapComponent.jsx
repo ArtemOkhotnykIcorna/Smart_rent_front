@@ -3,6 +3,7 @@ import Map, {GeolocateControl, Marker, ScaleControl} from 'react-map-gl';
 import './mapcomponent.scss'
 import {getDataAboutUser, getSitiesByName, getSitiesByObl, getSityByCoordination} from "../../Service/service";
 import User from "../User/User";
+import Pin from "../Pin/Pin";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN
 const MapComponent = () => {
@@ -127,7 +128,18 @@ const MapComponent = () => {
                                     longitude={house.latitude}
                                     latitude={house.longitude}
                                 />
+
+
+
+
                             ))}
+
+                            <Marker
+                                longitude={longitude}
+                                latitude={latitude}
+                            >
+                                <Pin></Pin>
+                            </Marker>
                             <ScaleControl />
                         </Map>
                         </>
